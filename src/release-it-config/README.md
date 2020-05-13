@@ -60,12 +60,12 @@ For example:
 If you want to skip using the tool, and instead use `release-it` as intended,
 you can do that too.
 
-Add a file called `release-it.js` to your project root, with the following contents:
+Add a file called `.release-it.js` to your project root, with the following contents:
 
 ```javascript
 'use strict';
 
-const config = require('@silvermine/release-it-config').default;
+const config = require('@silvermine/standardization/release-it-config');
 
 module.exports = {
    plugins: config.plugins,
