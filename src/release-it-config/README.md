@@ -104,13 +104,11 @@ something like `user/prepare-vYOUR.VERSION.NUMBER`.
 
 ## Development
 
-For development in this project, the following npm scripts are available:
+For development in this project, you can install the project globally as follows:
 
-   * `release:rc`: Perform a pre-release.
-   * `release:tag`: Tag the release.
-   * `release`: Perform a full release.
-   * `release:local`: Utility script called by the scripts above passing the `--dev` option.
+Run a build: `grunt build`
 
+Install the project globally: `npm i -g ./` or `npm link`
 
 ## Fixing Problems
 
