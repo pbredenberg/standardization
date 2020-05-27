@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+See [our coding standards][commit-messages] for commit guidelines.
+
+{{#each releases}}
+   {{#if href}}
+      ## [{{title}}]({{href}}){{#if tag}} - ({{isoDate}}){{/if}}
+   {{else}}
+      ## {{title}}{{#if tag}} - ({{isoDate}}){{/if}}
+   {{/if}}
+
+   {{#if summary}}
+      {{summary}}
+   {{/if}}
+
+   {{#commit-list commits heading='### Features' message='feat: '}}
+      * {{#if breaking}}**Breaking change:** {{/if}}{{subject}} {{#if href}}[`{{shorthash}}`]({{href}}){{/if}}
+   {{/commit-list}}
+
+   {{#commit-list commits heading='### Bug Fixes' message='fix: '}}
+      * {{#if breaking}}**Breaking change:** {{/if}}{{subject}} {{#if href}}[`{{shorthash}}`]({{href}}){{/if}}
+   {{/commit-list}}
+
+{{/each}}
+
+[commit-messages]: https://github.com/silvermine/silvermine-info/blob/master/commit-history.md#commit-messages

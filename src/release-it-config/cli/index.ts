@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import releaseIt from 'release-it';
 import _ from 'underscore';
+import recommendedBump from 'conventional-recommended-bump';
 import releaseItOptions from '../';
 import { IReleaseItOptions } from '../interfaces';
 import {
@@ -30,7 +31,7 @@ const run = (): void => {
 
       releaseIt(options)
          .then((output: any) => {
-            console.log('(silvermine-release) finished:', output); // eslint-disable-line
+            console.log('(silvermine-release) finished:', output.version); // eslint-disable-line
          });
    };
 
@@ -58,6 +59,11 @@ const run = (): void => {
    if (!isExecutable) {
       return;
    }
+
+   recommendedBump({ preset: 'conventionalcommits' }, (error: unknown, recommendation: Record<string, any>) => {
+      console.log('error', error); // eslint-disable-line
+      console.log('recommendation', recommendation); // eslint-disable-line
+   });
 
    runRelease(config);
 };
