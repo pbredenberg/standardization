@@ -23,7 +23,7 @@ module.exports = (grunt) => {
          },
       },
       hbs: {
-         templates: `./src/${appConfigs.releaseIt.dirName}/changelog-templates/*.hbs`,
+         templates: `./src/${appConfigs.releaseIt.dirName}/auto-changelog/templates/*.hbs`,
       },
       ts: {
          src: './src/**/*.ts',
@@ -51,7 +51,7 @@ module.exports = (grunt) => {
             // Should this path change we should update the resolved path to plugins
             // in src/release-it-config/config.ts.
             plugins: `./dist/${appConfigs.releaseIt.dirName}/plugins`,
-            templates: `./dist/${appConfigs.releaseIt.dirName}/changelog-templates`,
+            templates: `./dist/${appConfigs.releaseIt.dirName}/auto-changelog/templates`,
          },
       },
       markdownlintConfig: grunt.file.readJSON('.markdownlint.json'),

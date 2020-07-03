@@ -7,6 +7,6 @@
       "index.ts",
       "types/**/*",
       "cli/**/*",
-      "utilities/**/*"
+      "auto-changelog/auto-changelog.ts"
    ]
 }

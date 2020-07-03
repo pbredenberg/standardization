@@ -3,23 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [our coding standards][commit-messages] for commit guidelines.
 
-## [v1.0.0](https://github.com/pbredenberg/standardization/compare/v1.0.0...v1.0.0) - (2020-06-03)
+## [v1.0.1](https://github.com/pbredenberg/standardization/compare/v1.0.1...v1.0.1) - (2020-07-10)
 
 ### Features
 
-* feat: add autochangelog and recommended-bump [`0303b6e`](https://github.com/pbredenberg/standardization/commit/0303b6eb7881b4c245423b776e164f0e6b73781c)
-* feat: implement autochangelog [`d19081b`](https://github.com/pbredenberg/standardization/commit/d19081bfaff3ed77deb8e6cb532ab3b2b8478075)
-* feat: adjust changelog pattern filter chore commits from log [`fab7ad6`](https://github.com/pbredenberg/standardization/commit/fab7ad674b5afebc93dcfe670c02630c8839a0d5)
+* feat: add autochangelog and recommended-bump [`875d64f`](https://github.com/pbredenberg/standardization/commit/875d64fcf9a0bed294e12ba24907f368d18b3441)
+* feat: implement autochangelog [`12531df`](https://github.com/pbredenberg/standardization/commit/12531dff911c45ccfad60b9488efcaf56dc08067)
+* feat: preserve previous changelog [`f5af909`](https://github.com/pbredenberg/standardization/commit/f5af9098c0a6ffb8726c7c414dc0724fecdd6210)
+* feat: adjust changelog pattern filter chore commits from log [`d6a126c`](https://github.com/pbredenberg/standardization/commit/d6a126c8fa3efe3c169aebb176ea68bbca7db4fd)
 
 ### Bug Fixes
 
-* fix: linter errors on markdownlint config in gruntfile [`5df49fb`](https://github.com/pbredenberg/standardization/commit/5df49fb2db592ff1bc32fac7ca1d973ace6c7b55)
-
-## v1.0.0 - (2020-05-20)
-
-### Bug Fixes
-
-* fix: version number was incorrect [`b9af7da`](https://github.com/pbredenberg/standardization/commit/b9af7da2b79c340dd1bd499f40ad4166a772ff58)
+* fix: linter errors on markdownlint config in gruntfile [`81ed7a5`](https://github.com/pbredenberg/standardization/commit/81ed7a5301da57a3b67a9a111d4584b2bede3178)
+* fix: last version bump used invalid commit message syntax [`2f28dc8`](https://github.com/pbredenberg/standardization/commit/2f28dc89b084af994dca17b1558a74f829ddfe46)
 
 
 [commit-messages]: https://github.com/silvermine/silvermine-info/blob/master/commit-history.md#commit-messages
