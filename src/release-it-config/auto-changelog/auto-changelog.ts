@@ -10,10 +10,12 @@ import {
    CHANGELOG_FOOTER
 } from '../index';
 
+// Provides a line count for the provided string.
 const getMultilineStringLineCount = (multilineString: string) => {
    return multilineString.split(/\r\n|\r|\n/).length;
 }
 
+// Reutrns the first line of a multiline string.
 const getFirstLineMultilineString = (multineString: string) => {
    if (getMultilineStringLineCount(multineString) <= 0) {
       return multineString;
