@@ -60,9 +60,13 @@ const run = (): void => {
       return;
    }
 
+   // TODO: Determine if recommended-bump is still needed:
    recommendedBump({ preset: 'conventionalcommits' }, (error: unknown, recommendation: Record<string, any>) => {
-      console.log('error', error); // eslint-disable-line
-      console.log('recommendation', recommendation); // eslint-disable-line
+      if (error) {
+         console.log('Error getting recommended bump:', error); // eslint-disable-line
+      }
+
+      console.log('Recommended bump:', recommendation); // eslint-disable-line
    });
 
    runRelease(config);
