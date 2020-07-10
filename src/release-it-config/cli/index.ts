@@ -3,6 +3,7 @@ import releaseIt from 'release-it';
 import _ from 'underscore';
 import recommendedBump from 'conventional-recommended-bump';
 import releaseItOptions from '../';
+import autoChangelog from '../auto-changelog/auto-changelog';
 import { IReleaseItOptions } from '../interfaces';
 import {
    preReleaseCommand,
@@ -10,7 +11,7 @@ import {
    helpCommand,
 } from './commands';
 
-const run = (): void => {
+const run = async (): Promise<void> => {
    const args = process.argv || [],
          config = Object.assign({}, releaseItOptions);
 
@@ -68,6 +69,8 @@ const run = (): void => {
 
       console.log('Recommended bump:', recommendation); // eslint-disable-line
    });
+
+   await autoChangelog();
 
    runRelease(config);
 };
