@@ -70,11 +70,7 @@ const config: IReleaseItOptions = {
       publish: false,
    },
    gitHub: REPOSITORY_RELEASE_SETTINGS,
-   gitLab: REPOSITORY_RELEASE_SETTINGS,
-   hooks: {
-      // Executes auto-changelog to generate the file.
-      'after:bump': `node ${path.resolve(__dirname)}/auto-changelog/auto-changelog.js`,
-   },
+   gitLab: REPOSITORY_RELEASE_SETTINGS
 };
 
 export {
