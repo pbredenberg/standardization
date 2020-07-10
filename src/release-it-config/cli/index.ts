@@ -4,7 +4,6 @@ import _ from 'underscore';
 import recommendedBump from 'conventional-recommended-bump';
 import releaseItOptions from '../';
 import autoChangelog from '../auto-changelog/auto-changelog';
-import { IReleaseItOptions } from '../interfaces';
 import {
    preReleaseCommand,
    tag,
@@ -25,15 +24,6 @@ const run = async (): Promise<void> => {
       });
 
       return matchedArgument ? matchedArgument.split('--')[1] : '';
-   };
-
-   const runRelease = (options: IReleaseItOptions): void => {
-      Object.assign(releaseItOptions, options);
-
-      releaseIt(options)
-         .then((output: any) => {
-            console.log('(silvermine-release) finished:', output.version); // eslint-disable-line
-         });
    };
 
    let isExecutable = false;
@@ -70,9 +60,13 @@ const run = async (): Promise<void> => {
       console.log('Recommended bump:', recommendation); // eslint-disable-line
    });
 
+   Object.assign(releaseItOptions, config);
+
+   const releaseResults = await releaseIt(config);
+
    await autoChangelog();
 
-   runRelease(config);
+   console.log('(silvermine-release) finished:', releaseResults.version); // eslint-disable-line
 };
 
 try {
