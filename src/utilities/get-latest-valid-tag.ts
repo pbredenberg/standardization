@@ -7,4 +7,4 @@ import { LATEST_VALID_TAG_COMMAND } from '../release-it-config';
  */
 export default async (): Promise<string> => {
    return await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid git tag');
-}
+};

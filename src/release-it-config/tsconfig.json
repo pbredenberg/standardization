@@ -6,7 +6,6 @@
    "include": [
       "index.ts",
       "types/**/*",
-      "cli/**/*",
-      "auto-changelog/auto-changelog.ts"
+      "cli/**/*"
    ]
 }

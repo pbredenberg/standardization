@@ -24,4 +24,4 @@ export default (command: string, logMessage: string): Promise<string> => {
          }
       );
    });
-}
+};
