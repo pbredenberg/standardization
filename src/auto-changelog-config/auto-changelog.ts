@@ -110,6 +110,4 @@ const run = async (): Promise<void> => {
    stream.write(fileOutput.join('\n'));
 };
 
-run();
-
 export default run;
