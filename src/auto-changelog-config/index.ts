@@ -17,13 +17,15 @@ const AUTOCHANGELOG_TEMPLATE_PATH = `${path.resolve(__dirname)}/auto-changelog/t
 
 // Generates auto-changlog command with options
 const autoChangelogCommand = async (): Promise<string> => {
+   const changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`;
+
    return [
       'npx',
       'auto-changelog',
       '-p',
       '--commit-limit false',
       `--template ${AUTOCHANGELOG_TEMPLATE_PATH}`,
-      `--output ${CHANGELOG_INFILE}`,
+      `--output ${changelogPath}`,
       '--unreleased-only',
       // Pass latest tag to get correct changeset
       `--latest-version ${await getLatestValidTag()}`,

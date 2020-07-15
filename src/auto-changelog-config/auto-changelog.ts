@@ -59,6 +59,7 @@ const run = async (): Promise<void> => {
    const stat = promisify(fs.stat),
          writeFile = promisify(fs.writeFile),
          writeStream = fs.createWriteStream,
+         changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`,
          changelogHeaderLineCount = getMultilineStringLineCount(CHANGELOG_HEADER);
 
    let isChangelogExisiting = false,
@@ -69,17 +70,17 @@ const run = async (): Promise<void> => {
 
    // Check for the changelog file.
    try {
-      await stat(CHANGELOG_INFILE);
+      await stat(changelogPath);
       isChangelogExisiting = true;
    } catch(error) {
-      console.log(`Changelog ${CHANGELOG_INFILE} not present, creating...`); // eslint-disable-line
+      console.log(`Changelog ${changelogPath} not present, creating...`); // eslint-disable-line
    }
 
    if (!isChangelogExisiting) {
       try {
          // Create a write out the file with our template.
          await writeFile(
-            CHANGELOG_INFILE,
+            changelogPath,
             `${CHANGELOG_HEADER}${CHANGELOG_FOOTER}`
          );
       } catch(error) {
@@ -88,7 +89,7 @@ const run = async (): Promise<void> => {
    }
 
    // Store the file contents in memory.
-   existingChangelog = await readCurrentChangelog(CHANGELOG_INFILE, changelogHeaderLineCount);
+   existingChangelog = await readCurrentChangelog(changelogPath, changelogHeaderLineCount);
 
    // Get latest changelog.
    output = await executeShellCommand(await autoChangelogCommand(), 'Generating changelog');
@@ -98,7 +99,7 @@ const run = async (): Promise<void> => {
       return;
    }
 
-   stream = writeStream(CHANGELOG_INFILE, { encoding: 'utf8' });
+   stream = writeStream(changelogPath, { encoding: 'utf8' });
 
    fileOutput = [
       CHANGELOG_HEADER,
