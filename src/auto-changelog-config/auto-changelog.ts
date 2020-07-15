@@ -4,7 +4,7 @@ import lineReader from 'line-reader';
 import { promisify } from 'util';
 import executeShellCommand from '../utilities/execute-shell-command';
 import {
-   AUTOCHANGELOG_COMMAND,
+   autoChangelogCommand,
    CHANGELOG_INFILE,
 } from '../index';
 import {
@@ -72,7 +72,7 @@ const run = async (): Promise<void> => {
       await stat(CHANGELOG_INFILE);
       isChangelogExisiting = true;
    } catch(error) {
-      console.log('Changelog not present, creating...'); // eslint-disable-line
+      console.log(`Changelog ${CHANGELOG_INFILE} not present, creating...`); // eslint-disable-line
    }
 
    if (!isChangelogExisiting) {
@@ -91,7 +91,7 @@ const run = async (): Promise<void> => {
    existingChangelog = await readCurrentChangelog(CHANGELOG_INFILE, changelogHeaderLineCount);
 
    // Get latest changelog.
-   output = await executeShellCommand(AUTOCHANGELOG_COMMAND, 'Generating changelog');
+   output = await executeShellCommand(await autoChangelogCommand(), 'Generating changelog');
 
    if (getFirstLineMultilineString(existingChangelog) === getFirstLineMultilineString(output)) {
       console.log('No new changes detected, exiting.'); // eslint-disable-line
