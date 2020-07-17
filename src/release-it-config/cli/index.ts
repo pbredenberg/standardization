@@ -52,11 +52,10 @@ const run = async (): Promise<void> => {
 
    let isExecutable = false,
        isExecutingChangelog = true,
+       isWritingChangelog = false,
        recommendedVersion: recommendedBump.Callback.Recommendation = {};
 
    recommendedVersion = await getRecommendedVersion();
-
-   console.log('args', args); // eslint-disable-line
 
    isExecutable = _.some(args, (arg: string): boolean => {
       const subCommand = (findSubCommand(arg) || '').split('=')[0];
@@ -64,6 +63,8 @@ const run = async (): Promise<void> => {
       if (subCommand === 'changelog') {
          return false;
       } else if (subCommand === 'release') {
+         isWritingChangelog = true;
+
          return true;
       } else if (subCommand === 'pre-release') {
          const prefix = getArgument(findSwitch('prefix'));
@@ -75,6 +76,7 @@ const run = async (): Promise<void> => {
          return preReleaseCommandResults;
       } else if (subCommand === 'tag') {
          isExecutingChangelog = false;
+
          return tag(config);
       }
 
@@ -95,7 +97,7 @@ const run = async (): Promise<void> => {
    }
 
    if (isExecutingChangelog) {
-      await autoChangelog(!!findSwitch('write'));
+      await autoChangelog(isWritingChangelog || !!findSwitch('write'));
    }
 
    console.log('(silvermine-release) finished'); // eslint-disable-line no-console
