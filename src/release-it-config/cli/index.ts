@@ -28,7 +28,7 @@ const run = async (): Promise<void> => {
 
    // Find a single argument if provided to a subcommand.
    // Example: silvermine-release my-command=argument
-   const getArgment = (arg: string): string => {
+   const getArgument = (arg: string): string => {
       return arg.split('=')[1];
    };
 
@@ -56,16 +56,19 @@ const run = async (): Promise<void> => {
 
    recommendedVersion = await getRecommendedVersion();
 
+   console.log('args', args); // eslint-disable-line
+
    isExecutable = _.some(args, (arg: string): boolean => {
-      const subCommand = (findSubCommand(arg) || '').split('=')[0],
-            option = getArgment(arg);
+      const subCommand = (findSubCommand(arg) || '').split('=')[0];
 
       if (subCommand === 'changelog') {
          return false;
       } else if (subCommand === 'release') {
          return true;
       } else if (subCommand === 'pre-release') {
-         const preReleaseCommandResults = preReleaseCommand([ option ], config, recommendedVersion.releaseType);
+         const prefix = getArgument(findSwitch('prefix'));
+
+         const preReleaseCommandResults = preReleaseCommand(prefix, config, recommendedVersion.releaseType);
 
          isExecutingChangelog = preReleaseCommandResults;
 
