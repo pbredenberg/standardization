@@ -103,8 +103,4 @@ const run = async (): Promise<void> => {
    console.log('(silvermine-release) finished'); // eslint-disable-line no-console
 };
 
-try {
-   run();
-} catch(error) {
-   console.error(error); // eslint-disable-line no-console
-}
+run();
