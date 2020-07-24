@@ -71,7 +71,7 @@ const run = async (): Promise<void> => {
 
          const preReleaseCommandResults = preReleaseCommand(prefix, config, recommendedVersion.releaseType);
 
-         isExecutingChangelog = preReleaseCommandResults;
+         isExecutingChangelog = false;
 
          return preReleaseCommandResults;
       } else if (subCommand === 'tag') {
