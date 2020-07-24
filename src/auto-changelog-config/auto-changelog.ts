@@ -58,7 +58,8 @@ const readCurrentChangelog = async (infile: string, startLineNumber: number): Pr
 /**
  * Runs auto-changelog with our custom options.
  *
- * @param isPrintOnly If set to true, the changelog will only be printed to the console.
+ * @param isWritingToFile If set to true, the changelog will write out
+ * changes to the changelog.
  */
 const run = async (isWritingToFile = false): Promise<void> => {
    const stat = promisify(fs.stat),
