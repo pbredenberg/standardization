@@ -24,7 +24,9 @@ const getRecommendedVersion = (): Promise<recommendedBump.Callback.Recommendatio
 
 const run = async (): Promise<void> => {
    const args = process.argv || [],
-         config = Object.assign({}, releaseItOptions);
+         config = Object.assign({}, releaseItOptions),
+         // TODO: Support additional args for auto-changelog
+         changelogArgs: string[] = [];
 
    // Find a single argument if provided to a subcommand.
    // Example: silvermine-release my-command=argument
@@ -97,7 +99,7 @@ const run = async (): Promise<void> => {
    }
 
    if (isExecutingChangelog) {
-      await autoChangelog(isWritingChangelog || !!findSwitch('write'));
+      await autoChangelog(isWritingChangelog || !!findSwitch('write'), changelogArgs);
    }
 
    console.log('(silvermine-release) finished'); // eslint-disable-line no-console

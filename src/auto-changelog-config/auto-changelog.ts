@@ -60,8 +60,10 @@ const readCurrentChangelog = async (infile: string, startLineNumber: number): Pr
  *
  * @param isWritingToFile If set to true, the changelog will write out
  * changes to the changelog.
+ * @param args Any additional arguments to be provided to auto-changelog
+ * see: <https://github.com/CookPete/auto-changelog#usage>
  */
-const run = async (isWritingToFile = false): Promise<void> => {
+const run = async (isWritingToFile = false, args: string[] = []): Promise<void> => {
    const stat = promisify(fs.stat),
          writeFile = promisify(fs.writeFile),
          writeStream = fs.createWriteStream,
@@ -99,7 +101,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
    existingChangelog = await readCurrentChangelog(changelogPath, changelogHeaderLineCount);
 
    // Get latest changelog.
-   output = await executeShellCommand(await autoChangelogCommand(), 'Generating changelog');
+   output = await executeShellCommand(await autoChangelogCommand(args), 'Generating changelog');
 
    generatedLineCount = output.split('\n').length;
 

@@ -15,21 +15,31 @@ const CHANGELOG_FOOTER =
 
 const AUTOCHANGELOG_TEMPLATE_PATH = `${path.resolve(__dirname)}/templates/template.hbs`;
 
-// Generates auto-changlog command with options
-const autoChangelogCommand = async (): Promise<string> => {
+/**
+ * Generates auto-changlog command with options
+ *
+ * @param args Any additional arguments to be provided to auto-changelog
+ * see: <https://github.com/CookPete/auto-changelog#usage>
+ */
+const autoChangelogCommand = async (args: string[] = []): Promise<string> => {
    const changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`,
-         getLatestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag');
+         getLatestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag'),
+         invocationCommand = [ 'npx', 'auto-changelog' ];
 
-   return [
-      'npx',
-      'auto-changelog',
+   let defaultArgs: string[];
+
+   defaultArgs = [
+      '-p',
       '--commit-limit false',
       '--backfill-limit false',
       `--template ${AUTOCHANGELOG_TEMPLATE_PATH}`,
       `--output ${changelogPath}`,
       '--stdout',
       `--starting-version ${getLatestValidTag}`,
-   ]
+   ];
+
+   return invocationCommand
+      .concat(args, defaultArgs)
       .join(' ');
 };
 
