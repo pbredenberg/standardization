@@ -2,6 +2,7 @@
 import fs from 'fs';
 import lineReader from 'line-reader';
 import { promisify } from 'util';
+import _ from 'underscore';
 import executeShellCommand from '../utilities/execute-shell-command';
 import {
    CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
@@ -78,7 +79,8 @@ const run = async (isWritingToFile = false): Promise<void> => {
        stream: fs.WriteStream,
        fileOutput: string[],
        output: string,
-       generatedLineCount: number;
+       generatedChangelogLines: string[],
+       formattedChangelog: (string | undefined)[];
 
    // Check for the changelog file.
    try {
@@ -131,7 +133,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
       'Executing git log'
    );
 
-   generatedLineCount = output.split('\n').length;
+   generatedChangelogLines = output.split('\n');
 
    // There's no new changelog to generate if:
    // 1. The first line of the current changelog matches the first line of
@@ -139,11 +141,27 @@ const run = async (isWritingToFile = false): Promise<void> => {
    // 2. Less than 2 lines of generated output were found. This typically
    //    indicates that all auto-changelog had to go one was a release with
    //    0 usable commits.
-   if (generatedLineCount <= 0 || getFirstLineMultilineString(existingChangelog) === getFirstLineMultilineString(output)) {
+   if (generatedChangelogLines.length <= 0 || getFirstLineMultilineString(existingChangelog) === getFirstLineMultilineString(output)) {
       console.log('Most recent changelog:\n\n', output); // eslint-disable-line
       console.log('No new changes detected, exiting...'); // eslint-disable-line
       return;
    }
+
+   formattedChangelog = _.compact(generatedChangelogLines.map((line) => {
+      const hash = line.replace(/^\s+/g, '').substring(0, 7),
+            commit = line.match(/(feat:|fix:).*/),
+            release = line.match(/(release v).*/);
+
+      if (commit) {
+         return `* ${hash} ${commit[0]}`;
+      }
+
+      if (release) {
+         return `## ${hash} ${release[0]}`;
+      }
+
+      return undefined;
+   }));
 
    if (isWritingToFile) {
       stream = writeStream(changelogPath, { encoding: 'utf8' });
@@ -158,7 +176,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
       stream.write(fileOutput.join('\n'));
    }
 
-   console.log('Changelog generated!\n', output); // eslint-disable-line
+   console.log('Changelog generated!\n', formattedChangelog.join('\n')); // eslint-disable-line
 };
 
 export default run;

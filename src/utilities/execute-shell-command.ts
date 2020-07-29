@@ -20,8 +20,8 @@ export default (command: string, logMessage: string): Promise<string> => {
                reject(error);
             }
 
-            // Return the output, removing any newlines at beginning
-            // or end of string.
+            // Return the output, removing any newlines/whitepsace at beginning
+            // of string, newlines at end.
             resolve(stdout.replace(/^\n|\n$/g, ''));
          }
       );
