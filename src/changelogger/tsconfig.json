@@ -7,6 +7,6 @@
       "index.ts",
       "types/**/*",
       "cli/**/*",
-      "auto-changelog.ts"
+      "changelogger.ts"
    ]
 }

@@ -4,13 +4,14 @@ import lineReader from 'line-reader';
 import { promisify } from 'util';
 import executeShellCommand from '../utilities/execute-shell-command';
 import {
-   autoChangelogCommand,
-   CHANGELOG_INFILE,
+   CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
 } from '../index';
 import {
    CHANGELOG_HEADER,
    CHANGELOG_FOOTER,
 } from './index';
+
+const CURRENT_PROJECT_PACKAGE_JSON: { version: number } = require(process.cwd() + '/package.json');
 
 // Provides a line count for the provided string.
 const getMultilineStringLineCount = (multilineString: string): number => {
@@ -63,7 +64,7 @@ const readCurrentChangelog = async (infile: string, startLineNumber: number): Pr
  * @param args Any additional arguments to be provided to auto-changelog
  * see: <https://github.com/CookPete/auto-changelog#usage>
  */
-const run = async (isWritingToFile = false, args: string[] = []): Promise<void> => {
+const run = async (isWritingToFile = false): Promise<void> => {
    const stat = promisify(fs.stat),
          writeFile = promisify(fs.writeFile),
          writeStream = fs.createWriteStream,
@@ -72,6 +73,8 @@ const run = async (isWritingToFile = false, args: string[] = []): Promise<void> 
 
    let isChangelogExisiting = false,
        existingChangelog = '',
+       latestValidTag = '',
+       latestVersion = `v${CURRENT_PROJECT_PACKAGE_JSON.version.toString()}`,
        stream: fs.WriteStream,
        fileOutput: string[],
        output: string,
@@ -97,11 +100,36 @@ const run = async (isWritingToFile = false, args: string[] = []): Promise<void> 
       }
    }
 
-   // Store the file contents in memory.
+   // Store the existing changelog file contents in memory.
    existingChangelog = await readCurrentChangelog(changelogPath, changelogHeaderLineCount);
 
+   // TODO: Move git commands and output processing to a different
+   // file/otherwise rearchitect.
+   try {
+      latestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag');
+   } catch(error) {
+      console.log('No valid tags found.'); // eslint-disable-line
+   }
+
+   try {
+      latestVersion = await executeShellCommand(`git describe ${latestVersion}`, 'Verifying version in package.json is a valid release');
+   } catch(error) {
+      console.log('Could not find release matching the version in package.json'); // eslint-disable-line
+      latestVersion = 'HEAD';
+   }
+
    // Get latest changelog.
-   output = await executeShellCommand(await autoChangelogCommand(args), 'Generating changelog');
+   output = await executeShellCommand(
+      [
+         'git log',
+         '--oneline',
+         '--no-merges',
+         // TODO: Allow user to pass in range of commits for comparison.
+         latestValidTag === '' ? '' : `${latestValidTag}...${latestVersion}`,
+      ]
+         .join(' '),
+      'Executing git log'
+   );
 
    generatedLineCount = output.split('\n').length;
 
@@ -111,7 +139,7 @@ const run = async (isWritingToFile = false, args: string[] = []): Promise<void> 
    // 2. Less than 2 lines of generated output were found. This typically
    //    indicates that all auto-changelog had to go one was a release with
    //    0 usable commits.
-   if (generatedLineCount <= 2 || getFirstLineMultilineString(existingChangelog) === getFirstLineMultilineString(output)) {
+   if (generatedLineCount <= 0 || getFirstLineMultilineString(existingChangelog) === getFirstLineMultilineString(output)) {
       console.log('Most recent changelog:\n\n', output); // eslint-disable-line
       console.log('No new changes detected, exiting...'); // eslint-disable-line
       return;

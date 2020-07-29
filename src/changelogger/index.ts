@@ -21,22 +21,30 @@ const AUTOCHANGELOG_TEMPLATE_PATH = `${path.resolve(__dirname)}/templates/templa
  * @param args Any additional arguments to be provided to auto-changelog
  * see: <https://github.com/CookPete/auto-changelog#usage>
  */
-const autoChangelogCommand = async (args: string[] = []): Promise<string> => {
+const changelogger = async (args: string[] = []): Promise<string> => {
    const changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`,
-         getLatestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag'),
          invocationCommand = [ 'npx', 'auto-changelog' ];
 
-   let defaultArgs: string[];
+   let defaultArgs: string[],
+       getLatestValidTag: string | undefined;
+
+   try {
+      getLatestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag');
+   } catch(error) {
+      console.log('No valid tags found.'); // eslint-disable-line
+   }
 
    defaultArgs = [
-      '-p',
       '--commit-limit false',
       '--backfill-limit false',
       `--template ${AUTOCHANGELOG_TEMPLATE_PATH}`,
       `--output ${changelogPath}`,
       '--stdout',
-      `--starting-version ${getLatestValidTag}`,
    ];
+
+   if (getLatestValidTag) {
+      defaultArgs.push(`--starting-version ${getLatestValidTag}`);
+   }
 
    return invocationCommand
       .concat(args, defaultArgs)
@@ -44,7 +52,8 @@ const autoChangelogCommand = async (args: string[] = []): Promise<string> => {
 };
 
 export {
-   autoChangelogCommand,
+   changelogger,
    CHANGELOG_HEADER,
    CHANGELOG_FOOTER,
+   LATEST_VALID_TAG_COMMAND,
 };

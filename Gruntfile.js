@@ -9,8 +9,8 @@ module.exports = (grunt) => {
       releaseIt: {
          dirName: 'release-it-config',
       },
-      autoChangelog: {
-         dirName: 'auto-changelog-config',
+      changelogger: {
+         dirName: 'changelogger',
       },
    };
 
@@ -23,7 +23,7 @@ module.exports = (grunt) => {
          ],
       },
       hbs: {
-         templates: `./src/${appConfigs.autoChangelog.dirName}/templates/*.hbs`,
+         templates: `./src/${appConfigs.changelogger.dirName}/templates/*.hbs`,
       },
       ts: {
          src: './src/**/*.ts',
@@ -35,7 +35,7 @@ module.exports = (grunt) => {
             standards: 'tsconfig.json',
             types: 'src/tsconfig.types.json',
             releaseIt: `src/${appConfigs.releaseIt.dirName}/tsconfig.json`,
-            autoChangelog: `src/${appConfigs.autoChangelog.dirName}/tsconfig.json`,
+            changelogger: `src/${appConfigs.changelogger.dirName}/tsconfig.json`,
          },
       },
       commands: {
@@ -48,8 +48,13 @@ module.exports = (grunt) => {
       },
       out: {
          dist: './dist/',
-         autoChangelog: {
-            templates: `./dist/${appConfigs.autoChangelog.dirName}/templates`,
+         releaseIt: {
+            // Should this path change we should update the resolved path to plugins
+            // in src/release-it-config/config.ts.
+            plugins: `./dist/${appConfigs.releaseIt.dirName}/plugins`,
+         },
+         changelogger: {
+            templates: `./dist/${appConfigs.changelogger.dirName}/templates`,
          },
       },
       markdownlintConfig: grunt.file.readJSON('.markdownlint.json'),
@@ -93,8 +98,8 @@ module.exports = (grunt) => {
          releaseItConfig: {
             cmd: `${config.commands.tsc} -p ${config.ts.configs.releaseIt} --pretty`,
          },
-         autoChangelogConfig: {
-            cmd: `${config.commands.tsc} -p ${config.ts.configs.autoChangelog} --pretty`,
+         changelogger: {
+            cmd: `${config.commands.tsc} -p ${config.ts.configs.changelogger} --pretty`,
          },
       },
 
@@ -111,7 +116,7 @@ module.exports = (grunt) => {
                   expand: true,
                   flatten: true,
                   src: config.hbs.templates,
-                  dest: config.out.autoChangelog.templates,
+                  dest: config.out.changelogger.templates,
                },
             ],
          },
@@ -143,7 +148,7 @@ module.exports = (grunt) => {
    grunt.registerTask('standards-fix', [ 'eslint:fix' ]);
 
    grunt.registerTask('build-types', [ 'exec:types' ]);
-   grunt.registerTask('build-tools', [ 'exec:releaseItConfig', 'exec:autoChangelogConfig' ]);
+   grunt.registerTask('build-tools', [ 'exec:releaseItConfig', 'exec:changelogger' ]);
    grunt.registerTask('build-ts-outputs', [ 'concurrent:build-ts-outputs' ]);
    grunt.registerTask('build', [ 'clean:dist', 'concurrent:build-ts-outputs', 'copy:main' ]);
 

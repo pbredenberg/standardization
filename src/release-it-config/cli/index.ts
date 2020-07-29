@@ -3,7 +3,7 @@ import releaseIt from 'release-it';
 import _ from 'underscore';
 import recommendedBump from 'conventional-recommended-bump';
 import releaseItOptions from '../';
-import autoChangelog from '../../auto-changelog-config/auto-changelog';
+import changelogger from '../../changelogger/changelogger';
 import {
    preReleaseCommand,
    tag,
@@ -24,9 +24,7 @@ const getRecommendedVersion = (): Promise<recommendedBump.Callback.Recommendatio
 
 const run = async (): Promise<void> => {
    const args = process.argv || [],
-         config = Object.assign({}, releaseItOptions),
-         // TODO: Support additional args for auto-changelog
-         changelogArgs: string[] = [];
+         config = Object.assign({}, releaseItOptions);
 
    // Find a single argument if provided to a subcommand.
    // Example: silvermine-release my-command=argument
@@ -54,6 +52,7 @@ const run = async (): Promise<void> => {
 
    let isExecutable = false,
        isExecutingChangelog = true,
+       isWritingChangelog = false,
        recommendedVersion: recommendedBump.Callback.Recommendation = {};
 
    recommendedVersion = await getRecommendedVersion();
@@ -96,9 +95,7 @@ const run = async (): Promise<void> => {
    }
 
    if (isExecutingChangelog) {
-      // TODO: We will implement our own changelog generator since auto-changelog does
-      // not support our requirements. Until then, disabling writing out the changelog.
-      await autoChangelog(false, changelogArgs);
+      await changelogger(isWritingChangelog || !!findSwitch('write'));
    }
 
    console.log('(silvermine-release) finished'); // eslint-disable-line no-console
