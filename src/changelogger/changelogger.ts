@@ -5,6 +5,11 @@ import { promisify } from 'util';
 import _ from 'underscore';
 import executeShellCommand from '../utilities/execute-shell-command';
 import {
+   getMultilineStringLineCount,
+   getFirstLineMultilineString,
+   renderTemplate,
+} from './utilities';
+import {
    CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
 } from '../index';
 import {
@@ -13,20 +18,6 @@ import {
 } from './index';
 
 const CURRENT_PROJECT_PACKAGE_JSON: { version: number } = require(process.cwd() + '/package.json');
-
-// Provides a line count for the provided string.
-const getMultilineStringLineCount = (multilineString: string): number => {
-   return multilineString.split(/\r\n|\r|\n/).length;
-};
-
-// Reutrns the first line of a multiline string.
-const getFirstLineMultilineString = (multineString: string): string | undefined => {
-   if (getMultilineStringLineCount(multineString) <= 0) {
-      return multineString;
-   }
-
-   return multineString.split('\n').find((line) => { return line !== ''; });
-};
 
 /**
  * Reads the changelog at the provided path, starting at the provided line number,
