@@ -110,12 +110,6 @@ module.exports = (grunt) => {
                {
                   expand: true,
                   flatten: true,
-                  src: config.js.releaseIt.plugins,
-                  dest: config.out.releaseIt.plugins,
-               },
-               {
-                  expand: true,
-                  flatten: true,
                   src: config.tpl.all,
                   dest: config.out.changelogger.templates,
                },
