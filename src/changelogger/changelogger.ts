@@ -1,4 +1,3 @@
-// import process from 'process';
 import fs from 'fs';
 import lineReader from 'line-reader';
 import { promisify } from 'util';
@@ -12,10 +11,7 @@ import {
 import {
    CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
 } from '../index';
-import {
-   CHANGELOG_HEADER,
-   CHANGELOG_FOOTER,
-} from './index';
+import { templateResolver } from './index';
 
 const CURRENT_PROJECT_PACKAGE_JSON: { version: number } = require(process.cwd() + '/package.json');
 
@@ -27,13 +23,15 @@ const CURRENT_PROJECT_PACKAGE_JSON: { version: number } = require(process.cwd() 
  * @param startLineNumber Line number at which to start reading/
  */
 const readCurrentChangelog = async (infile: string, startLineNumber: number): Promise<string> => {
+   const changelogFooter = await templateResolver('footer');
+
    let lineCount = 0,
        existingChangelog = '';
 
    return new Promise((resolve) => {
       // Open the file for reading.
       lineReader.eachLine(infile, (line, isLast) => {
-         const isLineChangeLogFooter = getFirstLineMultilineString(CHANGELOG_FOOTER) === line;
+         const isLineChangeLogFooter = getFirstLineMultilineString(changelogFooter) === line;
 
          if (isLast || isLineChangeLogFooter) {
             resolve(existingChangelog);
@@ -60,18 +58,30 @@ const run = async (isWritingToFile = false): Promise<void> => {
    const stat = promisify(fs.stat),
          writeFile = promisify(fs.writeFile),
          writeStream = fs.createWriteStream,
-         changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`,
-         changelogHeaderLineCount = getMultilineStringLineCount(CHANGELOG_HEADER);
+         changelogPath = `${process.cwd()}/${CHANGELOG_INFILE}`;
 
    let isChangelogExisiting = false,
        existingChangelog = '',
        latestValidTag = '',
        latestVersion = `v${CURRENT_PROJECT_PACKAGE_JSON.version.toString()}`,
+       changelogHeaderTemplate: string,
+       changelogFooterTemplate: string,
+       changelogCommitTemplate: string,
+       changelogReleaseHeaderTemplate: string,
+       changelogHeaderLineCount: number,
        stream: fs.WriteStream,
        fileOutput: string[],
        output: string,
        generatedChangelogLines: string[],
-       formattedChangelog: (string | undefined)[];
+       formattedChangelog: string;
+
+   // Get default template contents
+   changelogHeaderTemplate = await templateResolver('header');
+   changelogFooterTemplate = await templateResolver('footer');
+   changelogCommitTemplate = await templateResolver('commit');
+   changelogReleaseHeaderTemplate = await templateResolver('release');
+
+   changelogHeaderLineCount = getMultilineStringLineCount(changelogHeaderTemplate);
 
    // Check for the changelog file.
    try {
@@ -86,7 +96,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
          // Create a write out the file with our template.
          await writeFile(
             changelogPath,
-            `${CHANGELOG_HEADER}${CHANGELOG_FOOTER}`
+            `${changelogHeaderTemplate}${changelogFooterTemplate}`
          );
       } catch(error) {
          console.error('Error creating file:', error); // eslint-disable-line
@@ -138,36 +148,44 @@ const run = async (isWritingToFile = false): Promise<void> => {
       return;
    }
 
-   formattedChangelog = _.compact(generatedChangelogLines.map((line) => {
-      const hash = line.replace(/^\s+/g, '').substring(0, 7),
-            commit = line.match(/(feat:|fix:).*/),
-            release = line.match(/(release v).*/);
+   formattedChangelog = _
+      .compact(generatedChangelogLines.map((line) => {
+         const hash = line.replace(/^\s+/g, '').substring(0, 7),
+               commit = line.match(/(feat:|fix:).*/),
+               release = line.match(/(release v).*/);
 
-      if (commit) {
-         return `* ${hash} ${commit[0]}`;
-      }
+         if (commit) {
+            return renderTemplate(changelogCommitTemplate, {
+               hash: hash,
+               commit: commit[0],
+            });
+         }
 
-      if (release) {
-         return `## ${hash} ${release[0]}`;
-      }
+         if (release) {
+            return renderTemplate(changelogReleaseHeaderTemplate, {
+               hash: hash,
+               release: release[0],
+            });
+         }
 
-      return undefined;
-   }));
+         return undefined;
+      }))
+      .join('\n');
 
    if (isWritingToFile) {
       stream = writeStream(changelogPath, { encoding: 'utf8' });
 
       fileOutput = [
-         CHANGELOG_HEADER,
-         output,
+         changelogHeaderTemplate,
+         formattedChangelog,
          existingChangelog,
-         CHANGELOG_FOOTER,
+         changelogFooterTemplate,
       ];
 
       stream.write(fileOutput.join('\n'));
    }
 
-   console.log('Changelog generated!\n', formattedChangelog.join('\n')); // eslint-disable-line
+   console.log('\nChangelog generated!\n', formattedChangelog); // eslint-disable-line
 };
 
 export default run;

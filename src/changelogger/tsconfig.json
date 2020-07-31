@@ -5,8 +5,8 @@
    },
    "include": [
       "index.ts",
-      "types/**/*",
-      "cli/**/*",
+      "templates/**/*",
+      "utilities/**/*",
       "changelogger.ts"
    ]
 }
