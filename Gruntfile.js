@@ -22,8 +22,8 @@ module.exports = (grunt) => {
             './src/**/*.js',
          ],
       },
-      hbs: {
-         templates: `./src/${appConfigs.changelogger.dirName}/templates/*.hbs`,
+      tpl: {
+         all: [ `src/${appConfigs.changelogger.dirName}/templates/*.tpl` ],
       },
       ts: {
          src: './src/**/*.ts',
@@ -110,7 +110,13 @@ module.exports = (grunt) => {
                {
                   expand: true,
                   flatten: true,
-                  src: config.hbs.templates,
+                  src: config.js.releaseIt.plugins,
+                  dest: config.out.releaseIt.plugins,
+               },
+               {
+                  expand: true,
+                  flatten: true,
+                  src: config.tpl.all,
                   dest: config.out.changelogger.templates,
                },
             ],
@@ -143,9 +149,9 @@ module.exports = (grunt) => {
    grunt.registerTask('standards-fix', [ 'eslint:fix' ]);
 
    grunt.registerTask('build-types', [ 'exec:types' ]);
-   grunt.registerTask('build-tools', [ 'exec:releaseItConfig', 'exec:changelogger' ]);
+   grunt.registerTask('build-tools', [ 'exec:changelogger', 'exec:releaseItConfig' ]);
    grunt.registerTask('build-ts-outputs', [ 'concurrent:build-ts-outputs' ]);
-   grunt.registerTask('build', [ 'clean:dist', 'concurrent:build-ts-outputs', 'copy:main' ]);
+   grunt.registerTask('build', [ 'clean:dist', 'copy:main', 'concurrent:build-ts-outputs' ]);
 
    grunt.registerTask('develop', [ 'clean:dist', 'build', 'watch' ]);
 
