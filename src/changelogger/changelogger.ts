@@ -47,6 +47,20 @@ const readCurrentChangelog = async (infile: string, startLineNumber: number): Pr
 };
 
 /**
+ * Get the compare statement to be provided to `git log`. If the latest version
+ * (typically parsed from package.json) matches the lates tag, the comparison will
+ * use the latest tag and HEAD.
+ *
+ * @param latestValidTag
+ * @param latestVersion
+ */
+const getCompareStatement = (latestValidTag: string, latestVersion: string): string => {
+   return latestValidTag === latestVersion
+      ? `${latestValidTag}...HEAD`
+      : `${latestValidTag}...${latestVersion}`;
+};
+
+/**
  * Runs auto-changelog with our custom options.
  *
  * @param isWritingToFile If set to true, the changelog will write out
@@ -128,7 +142,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
          '--oneline',
          '--no-merges',
          // TODO: Allow user to pass in range of commits for comparison.
-         latestValidTag === '' ? '' : `${latestValidTag}...${latestVersion}`,
+         latestValidTag === '' ? '' : getCompareStatement(latestValidTag, latestVersion),
       ]
          .join(' '),
       'Executing git log'
