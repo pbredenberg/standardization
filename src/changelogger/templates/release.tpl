@@ -1,2 +1,2 @@
 
-## <%= hash %> <%= release %>
+## [<%= release %>](<%= compareLink %>) - <%= commitDate %>

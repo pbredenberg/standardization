@@ -1,6 +1,6 @@
 declare module 'release-it';
 
-declare module 'auto-changelog' {
+declare module 'auto-changelog/src/remote' {
    interface RemoteData {
       getCommitLink: (id: string) => string;
       getIssueLink: (id: string) => string;
@@ -20,12 +20,12 @@ declare module 'auto-changelog' {
    /**
     * Returns an object with details about the the remote.
     */
-   const getRemote: (options: AutoChangelogOptions) => RemoteData;
+   const fetchRemote: (options: AutoChangelogOptions) => RemoteData;
 
    /**
     * Returns the getRemote object after fetching details from the repo.
     */
-   const fetchRemote: (remoteUrl: string, options: AutoChangelogOptions) => typeof getRemote;
+   const getRemote: (remoteUrl: string, options: AutoChangelogOptions) => RemoteData;
 
    export {
       getRemote,

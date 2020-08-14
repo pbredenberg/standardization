@@ -1,1 +1,1 @@
-* <%= hash %> <%= commit %>
+* <%= commit %> [`<%= hash %>`](<%= commitURL %>/<%= fullHash %>)

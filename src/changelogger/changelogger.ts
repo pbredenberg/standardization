@@ -13,6 +13,7 @@ import {
    CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
 } from '../index';
 import { templateResolver } from './index';
+import { getOriginData, getCommitDate } from './utilities/git';
 
 const CURRENT_PROJECT_PACKAGE_JSON: { version: number } = require(process.cwd() + '/package.json');
 
@@ -170,26 +171,24 @@ const run = async (isWritingToFile = false): Promise<void> => {
       const hash = line.replace(/^\s+/g, '').substring(0, 7),
             commit = line.match(/(feat:|fix:).*/),
             release = line.match(/(release v).*/),
-            fullHash = await getFullHash(hash);
-
-      let isPreRelease: () => boolean;
-
-      isPreRelease = (): boolean => {
-         return release !== null && release[0].indexOf('rc.') > 0;
-      };
+            fullHash = await getFullHash(hash),
+            isPreRelease = !!release && !!release[0].match(/(rc.|alhpa.|beta.)/),
+            originData = await getOriginData();
 
       if (commit) {
          return renderTemplate(changelogCommitTemplate, {
             hash: hash,
             fullHash: fullHash,
             commit: commit[0],
+            commitURL: originData.getCommitLink(fullHash),
          });
       }
 
       if (release && !isPreRelease) {
          return renderTemplate(changelogReleaseHeaderTemplate, {
-            hash: hash,
             release: release[0],
+            compareLink: originData.getCompareLink(latestValidTag, latestVersion),
+            commitDate: await getCommitDate(fullHash),
          });
       }
 
