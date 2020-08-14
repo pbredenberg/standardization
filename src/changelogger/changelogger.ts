@@ -7,6 +7,7 @@ import {
    getMultilineStringLineCount,
    getFirstLineMultilineString,
    renderTemplate,
+   getFullHash,
 } from './utilities';
 import {
    CHANGELOG_INFILE, LATEST_VALID_TAG_COMMAND,
@@ -87,6 +88,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
        fileOutput: string[],
        output: string,
        generatedChangelogLines: string[],
+       commitList: (string | undefined)[],
        formattedChangelog: string;
 
    // Get default template contents
@@ -120,8 +122,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
    // Store the existing changelog file contents in memory.
    existingChangelog = await readCurrentChangelog(changelogPath, changelogHeaderLineCount);
 
-   // TODO: Move git commands and output processing to a different
-   // file/otherwise rearchitect.
+   // TODO: Move to `utilities/git`
    try {
       latestValidTag = await executeShellCommand(LATEST_VALID_TAG_COMMAND, 'Getting latest valid tag');
    } catch(error) {
@@ -129,6 +130,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
    }
 
    try {
+      // TODO: Move to `utilities/git`
       latestVersion = await executeShellCommand(`git describe ${latestVersion}`, 'Verifying version in package.json is a valid release');
    } catch(error) {
       console.log('Could not find release matching the version in package.json'); // eslint-disable-line
@@ -136,6 +138,7 @@ const run = async (isWritingToFile = false): Promise<void> => {
    }
 
    // Get latest changelog.
+   // TODO: Move to `utilities/git`
    output = await executeShellCommand(
       [
          'git log',
@@ -162,29 +165,40 @@ const run = async (isWritingToFile = false): Promise<void> => {
       return;
    }
 
-   formattedChangelog = _
-      .compact(generatedChangelogLines.map((line) => {
-         const hash = line.replace(/^\s+/g, '').substring(0, 7),
-               commit = line.match(/(feat:|fix:).*/),
-               release = line.match(/(release v).*/);
+   // Retrieve our changelog lines.
+   commitList = await Promise.all(generatedChangelogLines.map(async (line) => {
+      const hash = line.replace(/^\s+/g, '').substring(0, 7),
+            commit = line.match(/(feat:|fix:).*/),
+            release = line.match(/(release v).*/),
+            fullHash = await getFullHash(hash);
 
-         if (commit) {
-            return renderTemplate(changelogCommitTemplate, {
-               hash: hash,
-               commit: commit[0],
-            });
-         }
+      let isPreRelease: () => boolean;
 
-         if (release) {
-            return renderTemplate(changelogReleaseHeaderTemplate, {
-               hash: hash,
-               release: release[0],
-            });
-         }
+      isPreRelease = (): boolean => {
+         return release !== null && release[0].indexOf('rc.') > 0;
+      };
 
-         return undefined;
-      }))
-      .join('\n');
+      if (commit) {
+         return renderTemplate(changelogCommitTemplate, {
+            hash: hash,
+            fullHash: fullHash,
+            commit: commit[0],
+         });
+      }
+
+      if (release && !isPreRelease) {
+         return renderTemplate(changelogReleaseHeaderTemplate, {
+            hash: hash,
+            release: release[0],
+         });
+      }
+
+      return undefined;
+   }));
+
+   // Filter out any undefined values from the commit list and join
+   // them into a mulitline string.
+   formattedChangelog = _.compact(commitList).join('\n');
 
    if (isWritingToFile) {
       stream = writeStream(changelogPath, { encoding: 'utf8' });
