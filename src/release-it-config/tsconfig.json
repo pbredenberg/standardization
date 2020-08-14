@@ -5,7 +5,7 @@
    },
    "include": [
       "index.ts",
-      "types/**/*",
+      "../types/**/*",
       "cli/**/*"
    ]
 }

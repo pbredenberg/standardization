@@ -5,6 +5,7 @@
    },
    "include": [
       "index.ts",
+      "../types/**/*",
       "templates/**/*",
       "utilities/**/*",
       "changelogger.ts"
